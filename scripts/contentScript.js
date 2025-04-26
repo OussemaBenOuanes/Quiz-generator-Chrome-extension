@@ -9,64 +9,68 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 // Function to extract text from the current webpage
 function extractTextFromPage() {
-  // Get the main content area, prioritize article content or common content areas
+  // Try to get the main content area, prioritize article content or common content areas
   const contentSelectors = [
-    'article', 
-    'main', 
-    '.content', 
+    'article',
+    'main',
+    '.content',
     '#content',
     '.article',
     '.post',
     '.entry-content'
   ];
-  
+
   let contentElement = null;
-  
+
   // Try to find a relevant content container
   for (const selector of contentSelectors) {
     const element = document.querySelector(selector);
-    if (element) {
+    if (element && element.innerText && element.innerText.trim().length > 100) {
       contentElement = element;
       break;
     }
   }
-  
+
   // If no specific content area found, use the body
   if (!contentElement) {
     contentElement = document.body;
   }
-  
-  // Extract text, prioritizing paragraph content
-  const paragraphs = contentElement.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li');
-  
-  if (paragraphs.length > 0) {
-    return Array.from(paragraphs)
-      .map(p => p.textContent.trim())
-      .filter(text => text.length > 0)
-      .join('\n\n');
-  }
-  
-  // If no paragraphs found, get all text content, excluding scripts and styles
-  const textNodes = [];
-  const walker = document.createTreeWalker(
-    contentElement,
-    NodeFilter.SHOW_TEXT,
-    {
-      acceptNode: function(node) {
-        if (!/^(script|style|noscript|iframe)$/i.test(node.parentNode.nodeName) && node.textContent.trim()) {
-          return NodeFilter.FILTER_ACCEPT;
-        }
-        return NodeFilter.FILTER_REJECT;
+
+  // Extract visible text only (skip scripts, styles, hidden, nav, footer, header, aside)
+  function getVisibleText(node) {
+    if (
+      node.nodeType === Node.TEXT_NODE &&
+      node.parentNode &&
+      node.textContent.trim() &&
+      window.getComputedStyle(node.parentNode).display !== "none" &&
+      window.getComputedStyle(node.parentNode).visibility !== "hidden"
+    ) {
+      return node.textContent.trim();
+    }
+    if (
+      node.nodeType === Node.ELEMENT_NODE &&
+      !['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'NAV', 'FOOTER', 'HEADER', 'ASIDE'].includes(node.nodeName) &&
+      window.getComputedStyle(node).display !== "none" &&
+      window.getComputedStyle(node).visibility !== "hidden"
+    ) {
+      let text = '';
+      for (let child of node.childNodes) {
+        text += getVisibleText(child) + ' ';
       }
+      return text;
     }
-  );
-  
-  while(walker.nextNode()) {
-    const text = walker.currentNode.textContent.trim();
-    if (text.length > 20) { // Only add nodes with substantial text
-      textNodes.push(text);
-    }
+    return '';
   }
-  
-  return textNodes.join('\n\n');
+
+  let text = getVisibleText(contentElement);
+
+  // Clean up excessive whitespace and blank lines
+  text = text.replace(/\s{2,}/g, ' ').replace(/(\n\s*){2,}/g, '\n\n').trim();
+
+  // If still too short, fallback to document.body.innerText
+  if (text.length < 100) {
+    text = document.body.innerText.replace(/\s{2,}/g, ' ').replace(/(\n\s*){2,}/g, '\n\n').trim();
+  }
+
+  return text;
 }

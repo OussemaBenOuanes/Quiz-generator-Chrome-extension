@@ -14,8 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
   extractBtn.addEventListener('click', function() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {action: "extractText"}, function(response) {
+        if (chrome.runtime.lastError) {
+          alert("Could not extract text from this page. Try refreshing the page or make sure you're not on a Chrome internal page (like chrome://extensions).");
+          return;
+        }
         if (response && response.text) {
           customText.value = response.text;
+        } else {
+          alert("No extractable text found on this page.");
         }
       });
     });
