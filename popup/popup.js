@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Elements
+  // njibou el 3anaser ml interface
   const extractBtn = document.getElementById('extractBtn');
   const generateBtn = document.getElementById('generateBtn');
   const copyBtn = document.getElementById('copyBtn');
@@ -10,33 +10,36 @@ document.addEventListener('DOMContentLoaded', function() {
   const quizResults = document.getElementById('quizResults');
   const questionsContainer = document.getElementById('questions');
 
-  // Extract text from current page
+  // ki tclicki 3la "extract", njarbo n5dhou el texte el asly ml page
   extractBtn.addEventListener('click', function() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {action: "extractText"}, function(response) {
+        // ken el content script mouch mawjouda, nwarri message
         if (chrome.runtime.lastError) {
-          alert("Could not extract text from this page. Try refreshing the page or make sure you're not on a Chrome internal page (like chrome://extensions).");
+          alert("ma najmtch n5ou el texte ml page hedhi. 3awed 3mil refresh wala at2akked elli enti mouch fi page mta3 chrome (ki chrome://extensions).");
           return;
         }
+        // ken l9ina texte, n7otouh fil textarea, ken la nwarri message
         if (response && response.text) {
           customText.value = response.text;
         } else {
-          alert("No extractable text found on this page.");
+          alert("ma fama hata texte ynajm yet7al ml page hedhi.");
         }
       });
     });
   });
 
-  // Generate quiz
+  // ki tclicki 3la "7addir el quiz", ncheckiw el input w nb3thou lil background
   generateBtn.addEventListener('click', async function() {
     const text = customText.value.trim();
     
+    // ken ma fama chay, ma na3mlou chay
     if (!text) {
-      alert('Please extract text from the page or paste your own text.');
+      alert('extracti texte ml page wala lsa9 texte mta3ek.');
       return;
     }
 
-    // Get quiz options
+    // na5dhou les options mta3 el quiz ml interface
     const options = {
       mcq: document.getElementById('mcqOption').checked,
       trueFalse: document.getElementById('trueFalseOption').checked,
@@ -45,18 +48,18 @@ document.addEventListener('DOMContentLoaded', function() {
       numQuestions: document.getElementById('numQuestions').value
     };
 
-    // Validate at least one question type is selected
+    // lazem au moins wa7ed men types mta3 les questions
     if (!options.mcq && !options.trueFalse && !options.shortAnswer) {
-      alert('Please select at least one question type.');
+      alert('ikhtar au moins type wa7ed mta3 les questions.');
       return;
     }
 
-    // Show loading indicator
+    // nwarri spinner w n5abi el results waqt el generation
     loadingIndicator.classList.remove('hidden');
     quizResults.classList.add('hidden');
 
     try {
-      // Send message to background script to generate quiz
+      // nb3thou lil background bech yjib el quiz
       chrome.runtime.sendMessage({
         action: "generateQuiz",
         text: text,
@@ -64,23 +67,24 @@ document.addEventListener('DOMContentLoaded', function() {
       }, function(response) {
         loadingIndicator.classList.add('hidden');
         
+        // ken raja3na questions, n'affichiw, ken la nwarri erreur
         if (response && response.questions) {
           displayQuestions(response.questions);
           quizResults.classList.remove('hidden');
 
-          // Store the quiz in local storage for export functions
+          // n5azznou el quiz fil storage bech nesta3mlouh fil export
           chrome.storage.local.set({currentQuiz: response.questions});
         } else {
-          alert('Failed to generate quiz. Please try again with different text or options.');
+          alert('ma najmtch na3ml el quiz. 7awel b texte okher wala options okhra.');
         }
       });
     } catch (error) {
       loadingIndicator.classList.add('hidden');
-      alert('An error occurred: ' + error.message);
+      alert('9a3ed sar mochkel: ' + error.message);
     }
   });
 
-  // Display questions in the popup
+  // n'affichiw les questions fil interface
   function displayQuestions(questions) {
     questionsContainer.innerHTML = '';
 
@@ -88,8 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const questionDiv = document.createElement('div');
       questionDiv.className = 'question';
 
-      let questionHTML = `<p><strong>Q${index + 1}:</strong> ${question.text}</p>`;
+      let questionHTML = `<p><strong>S${index + 1}:</strong> ${question.text}</p>`;
 
+      // n'affichiw les options fil MCQ, reponse fil True/False, wala reponse model fil short answer
       if (question.type === 'mcq') {
         questionHTML += '<ul>';
         question.options.forEach((option, i) => {
@@ -98,30 +103,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         questionHTML += '</ul>';
       } else if (question.type === 'true_false') {
-        questionHTML += `<p>Answer: ${question.answer}</p>`;
+        questionHTML += `<p>el ijaba: ${question.answer}</p>`;
       } else if (question.type === 'short_answer') {
-        questionHTML += `<p>Sample Answer: ${question.answer}</p>`;
+        questionHTML += `<p>ijaba model: ${question.answer}</p>`;
       }
 
-      questionHTML += `<p><em>Difficulty: ${question.difficulty}</em></p>`;
+      questionHTML += `<p><em>el sou3ba: ${question.difficulty}</em></p>`;
       questionDiv.innerHTML = questionHTML;
       questionsContainer.appendChild(questionDiv);
     });
   }
 
-  // Copy quiz to clipboard
+  // nansakhou el quiz fil clipboard texte
   copyBtn.addEventListener('click', function() {
     chrome.storage.local.get(['currentQuiz'], function(result) {
       if (result.currentQuiz) {
         const quizText = formatQuizForText(result.currentQuiz);
         navigator.clipboard.writeText(quizText)
-          .then(() => alert('Quiz copied to clipboard!'))
-          .catch(err => alert('Failed to copy: ' + err));
+          .then(() => alert('el quiz tensa5!'))
+          .catch(err => alert('ma najmtch nansakh: ' + err));
       }
     });
   });
 
-  // Download quiz as JSON
+  // na3mlou download lil quiz fil JSON
   downloadBtn.addEventListener('click', function() {
     chrome.storage.local.get(['currentQuiz'], function(result) {
       if (result.currentQuiz) {
@@ -136,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Export for Moodle
+  // na3mlou export lil quiz fil Moodle XML
   moodleBtn.addEventListener('click', function() {
     chrome.storage.local.get(['currentQuiz'], function(result) {
       if (result.currentQuiz) {
@@ -152,12 +157,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Format quiz for plain text
+  // na7dher el quiz texte bech nansakh
   function formatQuizForText(questions) {
-    let text = "GENERATED QUIZ\n\n";
+    let text = "el quiz el moujoud\n\n";
     
     questions.forEach((question, index) => {
-      text += `Question ${index + 1}: ${question.text}\n`;
+      text += `so2al ${index + 1}: ${question.text}\n`;
       
       if (question.type === 'mcq') {
         question.options.forEach((option, i) => {
@@ -165,18 +170,18 @@ document.addEventListener('DOMContentLoaded', function() {
           text += `${marker}${String.fromCharCode(97 + i)}. ${option}\n`;
         });
       } else if (question.type === 'true_false') {
-        text += `Answer: ${question.answer}\n`;
+        text += `el ijaba: ${question.answer}\n`;
       } else if (question.type === 'short_answer') {
-        text += `Sample Answer: ${question.answer}\n`;
+        text += `ijaba model: ${question.answer}\n`;
       }
       
-      text += `Difficulty: ${question.difficulty}\n\n`;
+      text += `el sou3ba: ${question.difficulty}\n\n`;
     });
     
     return text;
   }
 
-  // Format quiz for Moodle XML
+  // na7dher el quiz fil Moodle XML
   function formatQuizForMoodle(questions) {
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<quiz>\n';
     
