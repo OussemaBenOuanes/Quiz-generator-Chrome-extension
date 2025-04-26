@@ -1,8 +1,8 @@
 # QuizGen Chrome Extension
 
-![QuizGen Screenshot 1](images/Capture d'écran 2025-04-27 000242.png)
-![QuizGen Screenshot 2](images/Capture d'écran 2025-04-27 000751.png)
-![QuizGen Screenshot 3](images/Capture d'écran 2025-04-27 000801.png)
+<a href="https://ibb.co/B5Q9WLNp"><img src="https://i.ibb.co/Rksqr2yF/Capture-d-cran-2025-04-27-000242.png" alt="Capture-d-cran-2025-04-27-000242" border="0"></a>
+<a href="https://ibb.co/TxHXW5Rx"><img src="https://i.ibb.co/0RfNs3ZR/Capture-d-cran-2025-04-27-000751.png" alt="Capture-d-cran-2025-04-27-000751" border="0"></a>
+<a href="https://ibb.co/WWXd0Rjh"><img src="https://i.ibb.co/nsyVBKtG/Capture-d-cran-2025-04-27-000801.png" alt="Capture-d-cran-2025-04-27-000801" border="0"></a>
 
 QuizGen is a Chrome extension that automatically generates quizzes from text content on any webpage. It uses Natural Language Processing (NLP) techniques to create multiple-choice questions, true/false questions, and short-answer questions based on the content.
 
