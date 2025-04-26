@@ -3,34 +3,64 @@
 <head>
   <title>QuizGen</title>
   <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+      vertical-align: middle;
+      font-size: 20px;
+      margin-right: 6px;
+    }
+    .export-options button .material-symbols-outlined {
+      margin-right: 4px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>QuizGen</h1>
-    
+    <h1>
+      <span class="material-symbols-outlined">quiz</span>
+      QuizGen
+    </h1>
     <div class="section">
-      <h2>Extract Text</h2>
-      <button id="extractBtn">Extract from Current Page</button>
+      <h2>
+        <span class="material-symbols-outlined">article</span>
+        Extract Text
+      </h2>
+      <button id="extractBtn">
+        <span class="material-symbols-outlined">content_copy</span>
+        Extract from Current Page
+      </button>
       <div class="or-divider">OR</div>
       <textarea id="customText" placeholder="Paste your own text here..."></textarea>
     </div>
-    
     <div class="section">
-      <h2>Quiz Options</h2>
+      <h2>
+        <span class="material-symbols-outlined">settings</span>
+        Quiz Options
+      </h2>
       <div class="options">
         <label>
           <input type="checkbox" id="mcqOption" checked>
+          <span class="material-symbols-outlined">list_alt</span>
           Multiple Choice Questions
         </label>
         <label>
           <input type="checkbox" id="trueFalseOption">
+          <span class="material-symbols-outlined">check_box</span>
           True/False Questions
         </label>
         <label>
           <input type="checkbox" id="shortAnswerOption">
+          <span class="material-symbols-outlined">short_text</span>
           Short Answer Questions
         </label>
         <div class="difficulty">
+          <span class="material-symbols-outlined">signal_cellular_alt</span>
           <span>Difficulty: </span>
           <select id="difficultyLevel">
             <option value="easy">Easy</option>
@@ -39,26 +69,39 @@
           </select>
         </div>
         <div class="num-questions">
+          <span class="material-symbols-outlined">format_list_numbered</span>
           <span>Number of questions: </span>
           <input type="number" id="numQuestions" min="1" max="20" value="5">
         </div>
       </div>
     </div>
-    
-    <button id="generateBtn" class="generate-btn">Generate Quiz</button>
-    
+    <button id="generateBtn" class="generate-btn">
+      <span class="material-symbols-outlined">auto_mode</span>
+      Generate Quiz
+    </button>
     <div id="loadingIndicator" class="loading hidden">
-      <div class="spinner"></div>
+      <span class="material-symbols-outlined spinner" style="font-size:36px;animation:spin 1s linear infinite;">autorenew</span>
       <p>Generating quiz questions...</p>
     </div>
-    
     <div id="quizResults" class="quiz-results hidden">
-      <h2>Generated Quiz</h2>
+      <h2>
+        <span class="material-symbols-outlined">checklist</span>
+        Generated Quiz
+      </h2>
       <div id="questions"></div>
       <div class="export-options">
-        <button id="copyBtn">Copy to Clipboard</button>
-        <button id="downloadBtn">Download as JSON</button>
-        <button id="moodleBtn">Export for Moodle</button>
+        <button id="copyBtn">
+          <span class="material-symbols-outlined">content_copy</span>
+          Copy to Clipboard
+        </button>
+        <button id="downloadBtn">
+          <span class="material-symbols-outlined">download</span>
+          Download as JSON
+        </button>
+        <button id="moodleBtn">
+          <span class="material-symbols-outlined">import_export</span>
+          Export for Moodle
+        </button>
       </div>
     </div>
   </div>
